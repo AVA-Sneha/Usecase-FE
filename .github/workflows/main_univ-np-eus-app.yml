@@ -11,10 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Use Node.js
+      - name: Node.js 
         uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
+          node-version: '18.x'
           
       - name: Install dependencies
         run: npm install
@@ -34,8 +34,9 @@ jobs:
         uses: azure/webapps-setup@v1
         with:
           app-name: 'UNIV-NP-EUS-APP'
+          runtime-stack: 'NODE|18-lts'
           sku: 'F1'
-          location: 'eastus'
+          location: 'East US'
           
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
