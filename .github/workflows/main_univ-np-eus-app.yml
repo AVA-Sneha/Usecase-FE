@@ -1,31 +1,51 @@
-name: Deploy to Azure App Service
+name: Build and deploy Node.js app to Azure Web App - UNIV-NP-EUS-APP
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18.x'
+      - name: Set up Node.js version
+        uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
 
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build
-        npm test
+      - name: npm install, build, and test
+        run: |
+          npm install js-yaml
+          npm run build 
+          npm run test 
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'UNIV-NP-EUS-APP'
-        slot-name: 'Production'
-        publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISHPROFILE }}
-        package: .
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: node-app
+          path: .
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: 'https://univ-np-eus-app.azurewebsites.net/'
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: node-app
+
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        with:
+          app-name: 'UNIV-NP-EUS-APP'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISHPROFILE }}
+          package: .
