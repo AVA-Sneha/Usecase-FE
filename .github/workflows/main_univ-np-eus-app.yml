@@ -9,39 +9,23 @@ jobs:
   build-and-deploy:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Node.js 
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18.x'
-          
-      - name: Install dependencies
-        run: npm install
-        
-      - name: Build
-        run: npm run build
-        
-      - name: Test
-        run: npm test
+    - uses: actions/checkout@v2
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      - name: Set up Azure App Service
-        uses: azure/webapps-setup@v1
-        with:
-          app-name: 'UNIV-NP-EUS-APP'
-          runtime-stack: 'NODE|18-lts'
-          sku: 'F1'
-          location: 'East US'
-          
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'UNIV-NP-EUS-APP'
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISHPROFILE }}
-          package: .
+    - name: Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build
+        npm test
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'UNIV-NP-EUS-APP'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AZURE_APPSERVICE_PUBLISHPROFILE }}
+        package: .
