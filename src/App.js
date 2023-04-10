@@ -34,7 +34,7 @@ function login(e) {
     email: document.getElementById('exampleInputEmail1').value,
     password: document.getElementById('exampleInputPassword1').value
   }
-  axios.post('http://52.141.216.5:9000/login', request)
+  axios.post('https://univ-np-eus-func.azurewebsites.net', request)
   .then( resp => {
     alert(resp.data.message);
   })
